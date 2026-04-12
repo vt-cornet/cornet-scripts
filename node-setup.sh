@@ -13,7 +13,7 @@
 #   5. Installs a dpkg hook to reapply the popup fix after Proxmox updates
 #
 # Usage:
-#   bash <(curl -s https://raw.githubusercontent.com/pratheeksu/cornet-scripts/main/node-setup.sh)
+#   bash <(curl -s https://raw.githubusercontent.com/vt-cornet/cornet-scripts/main/node-setup.sh)
 #
 # Or if running locally:
 #   bash node-setup.sh
@@ -127,8 +127,8 @@ suppress_popup() {
     # Backup original
     cp "$JS_FILE" "${JS_FILE}.bak"
 
-    # Apply patch — replaces the subscription check with a no-op
-    sed -i "s|if (data.status !== 'Active')|if (false) /* cornet_patched */|g" "$JS_FILE"
+    # Apply patch — short-circuits the subscription check (Proxmox 8.4 syntax)
+    sed -i "s|res.data.status.toLowerCase() !== 'active'|res.data.status.toLowerCase() !== 'active' \&\& false /* cornet_patched */|g" "$JS_FILE"
 
     if grep -q "cornet_patched" "$JS_FILE"; then
         info "Subscription popup suppressed successfully."
@@ -155,7 +155,7 @@ DPkg::Post-Invoke {
     "if dpkg -l proxmox-widget-toolkit 2>/dev/null | grep -q '^ii'; then \
         JS=/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; \
         if [ -f \"$JS\" ] && ! grep -q 'cornet_patched' \"$JS\"; then \
-            sed -i \"s|if (data.status !== 'Active')|if (false) /* cornet_patched */|g\" \"$JS\"; \
+            sed -i \"s|res.data.status.toLowerCase() !== 'active'|res.data.status.toLowerCase() !== 'active' \&\& false /* cornet_patched */|g\" \"$JS\"; \
         fi; \
     fi";
 };
