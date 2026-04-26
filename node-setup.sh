@@ -7,10 +7,11 @@
 #
 # What this script does:
 #   1. Disables enterprise repositories
-#   2. Adds no-subscription repositories (PVE + Ceph Quincy)
-#   3. Runs a full system update
-#   4. Suppresses the subscription popup in the web UI
-#   5. Installs a dpkg hook to reapply the popup fix after Proxmox updates
+#   2. Removes duplicate pve-no-subscription entry from /etc/apt/sources.list
+#   3. Adds no-subscription repositories (PVE + Ceph Quincy)
+#   4. Runs a full system update
+#   5. Suppresses the subscription popup in the web UI
+#   6. Installs a helper script + dpkg hook to reapply popup fix after updates
 #
 # Usage:
 #   bash <(curl -s https://raw.githubusercontent.com/vt-cornet/cornet-scripts/main/node-setup.sh)
@@ -25,7 +26,7 @@ set -euo pipefail
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 info()    { echo -e "${GREEN}[INFO]${NC}  $1"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC}  $1"; }
@@ -65,14 +66,27 @@ else
 fi
 
 # =============================================================================
-# STEP 2 — Add No-Subscription Repositories
+# STEP 2 — Remove Duplicate pve-no-subscription from /etc/apt/sources.list
 # =============================================================================
-section "Step 2: Adding No-Subscription Repositories"
+section "Step 2: Cleaning Up Duplicate Repository Entries"
+
+MAIN_SOURCES="/etc/apt/sources.list"
+
+if grep -q "^deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" "$MAIN_SOURCES"; then
+    sed -i '/^deb http:\/\/download.proxmox.com\/debian\/pve bookworm pve-no-subscription/d' "$MAIN_SOURCES"
+    info "Removed duplicate pve-no-subscription entry from sources.list."
+else
+    info "No duplicate pve-no-subscription entry found — skipping."
+fi
+
+# =============================================================================
+# STEP 3 — Add No-Subscription Repositories
+# =============================================================================
+section "Step 3: Adding No-Subscription Repositories"
 
 PVE_NOSUB="/etc/apt/sources.list.d/pve-no-subscription.list"
 CEPH_NOSUB="/etc/apt/sources.list.d/ceph-no-subscription.list"
 
-# PVE no-subscription repo
 if grep -q "pve-no-subscription" "$PVE_NOSUB" 2>/dev/null; then
     info "PVE no-subscription repository already present — skipping."
 else
@@ -81,7 +95,6 @@ else
     info "Added PVE no-subscription repository."
 fi
 
-# Ceph Quincy no-subscription repo
 if grep -q "ceph-quincy" "$CEPH_NOSUB" 2>/dev/null; then
     info "Ceph Quincy no-subscription repository already present — skipping."
 else
@@ -91,9 +104,9 @@ else
 fi
 
 # =============================================================================
-# STEP 3 — System Update
+# STEP 4 — System Update
 # =============================================================================
-section "Step 3: Running System Update"
+section "Step 4: Running System Update"
 
 info "Updating package lists..."
 apt-get update -qq
@@ -106,9 +119,9 @@ DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y \
 info "System update complete."
 
 # =============================================================================
-# STEP 4 — Suppress Subscription Popup
+# STEP 5 — Suppress Subscription Popup
 # =============================================================================
-section "Step 4: Suppressing Subscription Popup"
+section "Step 5: Suppressing Subscription Popup"
 
 suppress_popup() {
     local JS_FILE="/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js"
@@ -118,23 +131,19 @@ suppress_popup() {
         return
     fi
 
-    # Check if already patched
     if grep -q "cornet_patched" "$JS_FILE"; then
         info "Popup suppression already applied — skipping."
         return
     fi
 
-    # Backup original
     cp "$JS_FILE" "${JS_FILE}.bak"
 
-    # Apply patch — short-circuits the subscription check (Proxmox 8.4 syntax)
     sed -i "s|res.data.status.toLowerCase() !== 'active'|res.data.status.toLowerCase() !== 'active' \&\& false /* cornet_patched */|g" "$JS_FILE"
 
     if grep -q "cornet_patched" "$JS_FILE"; then
         info "Subscription popup suppressed successfully."
     else
-        warn "Patch may not have applied correctly. Check $JS_FILE manually."
-        # Restore backup if patch failed
+        warn "Patch did not apply. Check $JS_FILE manually."
         cp "${JS_FILE}.bak" "$JS_FILE"
     fi
 }
@@ -142,27 +151,46 @@ suppress_popup() {
 suppress_popup
 
 # =============================================================================
-# STEP 5 — Install dpkg Hook to Reapply Popup Fix After Updates
+# STEP 6 — Install Helper Script + dpkg Hook for Popup Fix Persistence
 # =============================================================================
-section "Step 5: Installing dpkg Hook for Popup Fix Persistence"
+section "Step 6: Installing dpkg Hook for Popup Fix Persistence"
 
-HOOK_DIR="/etc/apt/apt.conf.d"
-HOOK_FILE="$HOOK_DIR/99cornet-popup-fix"
+HELPER_SCRIPT="/usr/local/bin/cornet-popup-fix"
+HOOK_FILE="/etc/apt/apt.conf.d/99cornet-popup-fix"
 
-cat > "$HOOK_FILE" << 'HOOK'
-// Reapply subscription popup suppression after proxmox-widget-toolkit updates
-DPkg::Post-Invoke {
-    "if dpkg -l proxmox-widget-toolkit 2>/dev/null | grep -q '^ii'; then \
-        JS=/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; \
-        if [ -f \"$JS\" ] && ! grep -q 'cornet_patched' \"$JS\"; then \
-            sed -i \"s|res.data.status.toLowerCase() !== 'active'|res.data.status.toLowerCase() !== 'active' \&\& false /* cornet_patched */|g\" \"$JS\"; \
-        fi; \
-    fi";
-};
-HOOK
+# Write the standalone helper script
+cat > "$HELPER_SCRIPT" << 'EOF'
+#!/bin/bash
+JS="/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js"
+if [ -f "$JS" ] && ! grep -q "cornet_patched" "$JS"; then
+    sed -i "s|res.data.status.toLowerCase() !== 'active'|res.data.status.toLowerCase() !== 'active' \&\& false /* cornet_patched */|g" "$JS"
+fi
+EOF
+
+chmod +x "$HELPER_SCRIPT"
+info "Helper script installed at $HELPER_SCRIPT."
+
+# Write the apt hook that calls the helper script
+cat > "$HOOK_FILE" << 'EOF'
+DPkg::Post-Invoke { "/usr/local/bin/cornet-popup-fix"; };
+EOF
 
 info "dpkg hook installed at $HOOK_FILE."
 info "Popup fix will be automatically reapplied after Proxmox updates."
+
+# =============================================================================
+# STEP 7 — Verify apt is Clean
+# =============================================================================
+section "Step 7: Verifying apt Configuration"
+
+APT_ERRORS=$(apt-get update 2>&1 | grep -E "^E:|^W:" || true)
+
+if [[ -z "$APT_ERRORS" ]]; then
+    info "apt configuration is clean — no errors or warnings."
+else
+    warn "apt reported the following issues:"
+    echo "$APT_ERRORS"
+fi
 
 # =============================================================================
 # DONE
@@ -170,8 +198,6 @@ info "Popup fix will be automatically reapplied after Proxmox updates."
 section "Setup Complete"
 
 info "Node setup finished successfully."
-info "Please restart the pveproxy service to apply the popup fix:"
-echo ""
-echo "    systemctl restart pveproxy"
-echo ""
-info "Then refresh your browser and verify the subscription popup is gone."
+info "Restarting pveproxy to apply the popup fix..."
+systemctl restart pveproxy
+info "Done. Refresh your browser and verify the subscription popup is gone."
