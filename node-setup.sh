@@ -12,6 +12,8 @@
 #   4. Runs a full system update
 #   5. Suppresses the subscription popup in the web UI
 #   6. Installs a helper script + dpkg hook to reapply popup fix after updates
+#   7. Installs the CORNET MOTD
+#   8. Verifies apt configuration is clean
 #
 # Usage:
 #   bash <(curl -s https://raw.githubusercontent.com/vt-cornet/cornet-scripts/main/node-setup.sh)
@@ -158,7 +160,6 @@ section "Step 6: Installing dpkg Hook for Popup Fix Persistence"
 HELPER_SCRIPT="/usr/local/bin/cornet-popup-fix"
 HOOK_FILE="/etc/apt/apt.conf.d/99cornet-popup-fix"
 
-# Write the standalone helper script
 cat > "$HELPER_SCRIPT" << 'EOF'
 #!/bin/bash
 JS="/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js"
@@ -170,7 +171,6 @@ EOF
 chmod +x "$HELPER_SCRIPT"
 info "Helper script installed at $HELPER_SCRIPT."
 
-# Write the apt hook that calls the helper script
 cat > "$HOOK_FILE" << 'EOF'
 DPkg::Post-Invoke { "/usr/local/bin/cornet-popup-fix"; };
 EOF
@@ -179,9 +179,24 @@ info "dpkg hook installed at $HOOK_FILE."
 info "Popup fix will be automatically reapplied after Proxmox updates."
 
 # =============================================================================
-# STEP 7 — Verify apt is Clean
+# STEP 7 — Install CORNET MOTD
 # =============================================================================
-section "Step 7: Verifying apt Configuration"
+section "Step 7: Installing CORNET MOTD"
+
+MOTD_DEST="/etc/update-motd.d/99-cornet-motd"
+MOTD_URL="https://raw.githubusercontent.com/vt-cornet/cornet-scripts/main/cornet-motd.sh"
+
+if curl -sf "$MOTD_URL" -o "$MOTD_DEST"; then
+    chmod +x "$MOTD_DEST"
+    info "CORNET MOTD installed at $MOTD_DEST."
+else
+    warn "Failed to download MOTD script from $MOTD_URL — skipping."
+fi
+
+# =============================================================================
+# STEP 8 — Verify apt is Clean
+# =============================================================================
+section "Step 8: Verifying apt Configuration"
 
 APT_ERRORS=$(apt-get update 2>&1 | grep -E "^E:|^W:" || true)
 
@@ -201,3 +216,4 @@ info "Node setup finished successfully."
 info "Restarting pveproxy to apply the popup fix..."
 systemctl restart pveproxy
 info "Done. Refresh your browser and verify the subscription popup is gone."
+info "The CORNET MOTD will appear on your next login."
