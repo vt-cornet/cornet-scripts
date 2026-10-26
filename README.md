@@ -15,6 +15,7 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │   ├── README.md               # DDNS service documentation and API reference
 │   ├── server/                 # DDNS backend (LXC 200: dns-server)
 │   │   ├── app.py              # Flask DDNS update API
+│   │   ├── register-node.sh    # CLI tool to register a new node in whitelist & dnsmasq
 │   │   ├── ddns-api.service    # Systemd service unit for Gunicorn
 │   │   ├── ddns-api.env.example# Environment template for authorization token
 │   │   ├── dnsmasq.conf        # Authoritative dnsmasq configuration & static records
@@ -37,6 +38,11 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │       ├── 299.fw              # PXE Securetest VM (VM 299)
 │       ├── 100.fw - 103.fw     # Research Compute VMs
 │       └── 9040.fw, 9099.fw    # Golden VM Templates
+│
+├── power/                      # Workstation power management & Wake-on-LAN
+│   ├── README.md               # WoL setup instructions, BIOS prerequisites, and wake guide
+│   ├── enable-wol.sh           # Persistent workstation WoL configuration (systemd-networkd/NM)
+│   └── wake-node.sh            # Remote MagicPacket wake trigger CLI
 │
 └── tools/                      # Lab workstation utilities
     ├── README.md               # Documentation for workstation tools

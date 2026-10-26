@@ -37,13 +37,35 @@ The DDNS service enables lab workstations and servers with dynamic campus IP add
 
 ```
 ddns/
-└── server/
-    ├── app.py                 # Flask API handling /health and /update
-    ├── ddns-api.service       # Systemd service unit for Gunicorn
-    ├── ddns-api.env.example   # Environment file template for token & configs
-    ├── dnsmasq.conf           # Authoritative dnsmasq configuration & static records
-    └── requirements.txt       # Python dependencies (Flask, gunicorn)
+├── server/
+│   ├── app.py                 # Flask API handling /health and /update
+│   ├── register-node.sh       # CLI tool to register a new node in whitelist & dnsmasq
+│   ├── ddns-api.service       # Systemd service unit for Gunicorn
+│   ├── ddns-api.env.example   # Environment file template for token & configs
+│   ├── dnsmasq.conf           # Authoritative dnsmasq configuration & static records
+│   └── requirements.txt       # Python dependencies (Flask, gunicorn)
+└── client/
+    ├── update-ddns.sh         # Linux updater (Hardened Multi-Interface Edition)
+    ├── cornet-ddns.service    # Linux systemd boot service
+    ├── update-ddns.ps1        # Windows PowerShell updater (with boot retry loop)
+    └── CORNET-DDNS-Update.xml # Windows Task Scheduler definition
 ```
+
+---
+
+## Node Registration (`register-node.sh`)
+
+To register a new workstation or server in the DDNS whitelist:
+
+```bash
+# Can be executed on cornet-node01 or directly inside LXC 200:
+./register-node.sh <HOSTNAME> [INITIAL_IP]
+
+# Example:
+./register-node.sh wvt-gnuc-03 128.173.94.103
+```
+*Automatically validates formatting, appends the hostname to `ALLOWED_HOSTNAMES` in `app.py`, updates `dnsmasq.conf`, restarts `ddns-api` and `dnsmasq`, and confirms API health.*
+
 
 ---
 
