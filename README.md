@@ -63,6 +63,14 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │   ├── setup-gnome-rdp-system.sh # Automated system-level daemon, TLS, and grdctl config
 │   └── fix-gnome-rdp.sh        # FreeRDP library rollback & macOS client handshake fix
 │
+├── student-vms/                # Golden template + per-student KVM VMs for course sessions
+│   ├── README.md               # Build, seal, clone, validate, hand-out and teardown guide
+│   ├── clone-advcell.sh        # Clone student VMs from template 9040 (static IP, firewall, CSV creds)
+│   ├── grd-firstboot.sh        # Per-VM GNOME Remote Desktop TLS key (first boot)
+│   ├── grd-firstboot.service   # Systemd one-shot unit for the above
+│   ├── 99-renderer-networkd.yaml # netplan override: keep networkd after installing the desktop
+│   └── student-vm.fw.template  # Per-VM Proxmox firewall template
+│
 ├── sdr-control/                # Software Defined Radio (SDR) hardware power & diagnostics
 │   ├── README.md               # Architecture guide for Ettus X310 and N310 SDRs
 │   ├── n310-ctl.sh             # USRP N310 safe shutdown, reboot, detection & MCU powerbtn simulation
@@ -117,3 +125,11 @@ Automates unattended bare-metal UEFI PXE deployment of Ubuntu onto Dell Pro Max 
 - **Hardware Pre-staging:** Registry preparation and Dell CCTK storage mode switching from RAID (Intel VMD) to AHCI.
 - **Subiquity Autoinstall:** Automated seed delivery (`user-data`) with live HTTP webhook progress telemetry to LXC 210.
 - **Dual-Boot Safety:** Safe one-time boot switching via `boot-windows` and WSL2 physical disk rescue script for Windows boot loops.
+
+### 5. Student Course VMs ([`student-vms/`](student-vms/))
+
+Builds a sealed Ubuntu golden VM on `cornet-node04` and clones one CPU-pinned, firewalled KVM VM per student (static IP, SSH + GNOME RDP over the VT VPN) for hands-on sessions such as OAI/FlexRIC/xApp development:
+
+- **Template + clones:** cloud-init static addressing, per-VM random credentials in a root-only CSV, per-VM TLS key for RDP.
+- **Isolation:** per-VM firewall with MAC/IP anti-spoofing and a node block, tracked in `firewall/guests/`.
+- **Operational notes:** quorum gating for a cluster with no margin, and the lessons learned from the first build.

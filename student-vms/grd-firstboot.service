@@ -1,0 +1,13 @@
+[Unit]
+Description=Per-VM GNOME Remote Desktop certificate
+# NOT After=cloud-final.service: that creates an ordering cycle with multi-user.target.
+After=cloud-init.service
+# A leftover rdp.key in the template would stop this from running on clones. Clean up before sealing.
+ConditionPathExists=!/var/lib/gnome-remote-desktop/rdp.key
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/grd-firstboot.sh
+
+[Install]
+WantedBy=multi-user.target

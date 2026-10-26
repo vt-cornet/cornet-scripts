@@ -1,0 +1,7 @@
+# Install as /etc/netplan/99-renderer-networkd.yaml (mode 600) in the golden VM and keep it in the template.
+# The ubuntu-desktop-minimal install adds /usr/lib/netplan/00-network-manager-all.yaml (renderer: NetworkManager),
+# which makes netplan skip the networkd .network file and the VM boots onto a private DHCP lease instead of
+# the static address cloud-init configured. This later-sorting file restores the networkd renderer.
+network:
+  version: 2
+  renderer: networkd

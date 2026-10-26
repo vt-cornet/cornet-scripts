@@ -1,0 +1,24 @@
+# Per-VM Proxmox firewall for student VMs. Save as /etc/pve/firewall/<vmid>.fw (substitute <VM_IP>).
+# Clones do NOT inherit this file; clone-advcell.sh writes one per VM. Rollback: rm /etc/pve/firewall/<vmid>.fw
+#
+# Requires the datacenter IP sets +dc/cluster-nodes (every node, lab PC and server the VM must not reach)
+# and +dc/approved-subnets (VT VPN and campus ranges) in firewall/cluster.fw.
+# The node-block rules MUST stay above the allow rules: approved-subnets contains the range the nodes live in.
+
+[OPTIONS]
+enable: 1
+dhcp: 1
+macfilter: 1
+ipfilter: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[IPSET ipfilter-net0]
+<VM_IP>
+
+[RULES]
+IN DROP -source +dc/cluster-nodes
+OUT DROP -dest +dc/cluster-nodes
+IN ACCEPT -source +dc/approved-subnets -p tcp -dport 22
+IN ACCEPT -source +dc/approved-subnets -p tcp -dport 3389
+IN ACCEPT -source +dc/approved-subnets -p icmp
