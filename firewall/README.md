@@ -78,18 +78,41 @@ scp firewall/guests/200.fw root@198.82.18.154:/etc/pve/firewall/200.fw
 
 ---
 
-## Workstation Firewall Setup (`setup-workstation-firewall.sh`)
+## Workstation Firewall Setup
+
+### 1. Ubuntu Workstations ([`setup-workstation-firewall.sh`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/firewall/setup-workstation-firewall.sh))
 
 To replicate the exact cluster security posture on Ubuntu lab workstations (`wvt-pratheek-pc`, `wvt-wstation1`, `wvt-wstation3`, `wvt-nuc-02`):
 
-[`setup-workstation-firewall.sh`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/firewall/setup-workstation-firewall.sh):
-- Enforces `default deny incoming` and `default allow outgoing`.
+- Enforces `default deny incoming` and `default allow outgoing` via UFW.
 - Restricts SSH (`22/tcp`) and RDP (`3389/tcp`) strictly to the 10 approved campus/VPN subnets.
 - Permits all traffic on `tailscale0` (if present).
 - Automatically detects and allows traffic on dedicated high-speed USRP SDR interfaces (e.g. `*f0np0`, `*f1np1`, `enp47s0`).
 
-**Usage on any workstation:**
+**Usage on Ubuntu:**
 ```bash
 sudo ./setup-workstation-firewall.sh
+```
+
+---
+
+### 2. Windows Workstations ([`setup-windows-firewall.ps1`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/firewall/setup-windows-firewall.ps1))
+
+On Windows partitions (`wvt465-xeon`, `wvt-pratheek-pc-win`, `wvt-wstation1-win`), enabling Remote Desktop by default leaves port 3389 open to the entire internet (`0.0.0.0/0`). 
+
+[`setup-windows-firewall.ps1`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/firewall/setup-windows-firewall.ps1) hardens Windows Defender Advanced Firewall to match cluster security:
+- Enforces `Block Inbound` and `Allow Outbound` across Domain, Private, and Public profiles.
+- Disables generic wide-open RDP and OpenSSH rules.
+- Creates dedicated inbound rules for RDP (TCP/UDP 3389) and SSH (TCP 22) restricted strictly to the 10 approved campus/VPN subnets.
+- Allows ICMPv4 ping from approved subnets for reachability monitoring.
+- Allows Tailscale overlay network traffic (`100.64.0.0/10`).
+- Allows USRP SDR and smart plug traffic (`192.168.0.0/16`).
+
+**Usage in elevated PowerShell (Run as Administrator):**
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup-windows-firewall.ps1
+
+# Or direct one-line run:
+irm https://raw.githubusercontent.com/vt-cornet/cornet-scripts/main/firewall/setup-windows-firewall.ps1 | iex
 ```
 
