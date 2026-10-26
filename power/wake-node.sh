@@ -22,8 +22,8 @@ if [[ -z "$TARGET" ]]; then
     echo "Known Node MAC Addresses:"
     echo "  wvt-pratheek-pc-ubuntu : ac:b4:80:3a:3a:9e"
     echo "  wvt-wstation1-ubuntu   : ac:b4:80:3a:3a:82"
-    echo "  wvt-wstation3-ubuntu   : 00:01:d2:19:05:9f"
-    echo "  wvt-nuc-02             : 88:ae:dd:0a:ff:41"
+    echo "  wvt-wstation3-ubuntu   : ac:b4:80:3a:3a:51"
+    echo "  wvt-nuc-02             : 58:47:ca:7c:1d:75"
     exit 1
 fi
 
@@ -31,10 +31,11 @@ fi
 case "${TARGET,,}" in
     wvt-pratheek-pc*|pratheek-pc) MAC="ac:b4:80:3a:3a:9e" ;;
     wvt-wstation1*|wstation1)     MAC="ac:b4:80:3a:3a:82" ;;
-    wvt-wstation3*|wstation3)     MAC="00:01:d2:19:05:9f" ;;
-    wvt-nuc-02*|nuc-02|nuc2)      MAC="88:ae:dd:0a:ff:41" ;;
+    wvt-wstation3*|wstation3)     MAC="ac:b4:80:3a:3a:51" ;;
+    wvt-nuc-02*|nuc-02|nuc2)      MAC="58:47:ca:7c:1d:75" ;;
     *)                            MAC="$TARGET" ;;
 esac
+
 
 echo "[+] Sending Wake-on-LAN MagicPacket to ${MAC} (broadcast: ${BROADCAST})..."
 
