@@ -62,7 +62,7 @@ Set-NetFirewallProfile -Profile Domain,Public,Private `
     -DefaultOutboundAction Allow `
     -NotifyOnListen False
 
-Write-Host "    [✓] Inbound blocked, Outbound allowed across Domain, Private, and Public profiles." -ForegroundColor Green
+Write-Host "    [OK] Inbound blocked, Outbound allowed across Domain, Private, and Public profiles." -ForegroundColor Green
 
 # -----------------------------------------------------------------------------
 # 4. Remove / Disable Generic Wide-Open Windows Rules
@@ -82,7 +82,7 @@ Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue 
 Get-NetFirewallRule -Name "CORNET-*" -ErrorAction SilentlyContinue | `
     Remove-NetFirewallRule -ErrorAction SilentlyContinue
 
-Write-Host "    [✓] Built-in wide-open rules suppressed." -ForegroundColor Green
+Write-Host "    [OK] Built-in wide-open rules suppressed." -ForegroundColor Green
 
 # -----------------------------------------------------------------------------
 # 5. Create Subnet-Restricted Inbound Rules
@@ -100,7 +100,7 @@ New-NetFirewallRule -Name "CORNET-RDP-In-TCP" `
     -RemoteAddress $ApprovedSubnets `
     -Profile Any `
     -Enabled True | Out-Null
-Write-Host "    [✓] Allowed RDP (TCP 3389) from 10 approved subnets." -ForegroundColor Green
+Write-Host "    [OK] Allowed RDP (TCP 3389) from 10 approved subnets." -ForegroundColor Green
 
 # 5.2 Remote Desktop (UDP 3389 - RDP 8.0+ acceleration)
 New-NetFirewallRule -Name "CORNET-RDP-In-UDP" `
@@ -113,7 +113,7 @@ New-NetFirewallRule -Name "CORNET-RDP-In-UDP" `
     -RemoteAddress $ApprovedSubnets `
     -Profile Any `
     -Enabled True | Out-Null
-Write-Host "    [✓] Allowed RDP (UDP 3389) from 10 approved subnets." -ForegroundColor Green
+Write-Host "    [OK] Allowed RDP (UDP 3389) from 10 approved subnets." -ForegroundColor Green
 
 # 5.3 OpenSSH Server (TCP 22)
 New-NetFirewallRule -Name "CORNET-SSH-In-TCP" `
@@ -126,7 +126,7 @@ New-NetFirewallRule -Name "CORNET-SSH-In-TCP" `
     -RemoteAddress $ApprovedSubnets `
     -Profile Any `
     -Enabled True | Out-Null
-Write-Host "    [✓] Allowed SSH (TCP 22) from 10 approved subnets." -ForegroundColor Green
+Write-Host "    [OK] Allowed SSH (TCP 22) from 10 approved subnets." -ForegroundColor Green
 
 # 5.4 ICMPv4 (Ping / Echo Request)
 New-NetFirewallRule -Name "CORNET-ICMP-In" `
@@ -139,7 +139,7 @@ New-NetFirewallRule -Name "CORNET-ICMP-In" `
     -RemoteAddress $ApprovedSubnets `
     -Profile Any `
     -Enabled True | Out-Null
-Write-Host "    [✓] Allowed ICMP Ping from 10 approved subnets." -ForegroundColor Green
+Write-Host "    [OK] Allowed ICMP Ping from 10 approved subnets." -ForegroundColor Green
 
 # 5.5 Tailscale VPN Access
 New-NetFirewallRule -Name "CORNET-Tailscale-In" `
@@ -150,25 +150,27 @@ New-NetFirewallRule -Name "CORNET-Tailscale-In" `
     -RemoteAddress "100.64.0.0/10" `
     -Profile Any `
     -Enabled True | Out-Null
-Write-Host "    [✓] Allowed Tailscale overlay network (100.64.0.0/10)." -ForegroundColor Green
+Write-Host "    [OK] Allowed Tailscale overlay network (100.64.0.0/10)." -ForegroundColor Green
 
-# 5.6 USRP SDR & Smart Plug Management LAN
-New-NetFirewallRule -Name "CORNET-SDR-Private-In" `
-    -DisplayName "CORNET - SDR & Smart Plug Private LAN" `
-    -Description "Allows inbound traffic from USRP SDRs (192.168.10.x, 192.168.20.x, 192.168.40.x) and smart plugs (192.168.8.x)." `
+# 5.6 USRP SDR and Smart Plug Management LAN
+New-NetFirewallRule -Name 'CORNET-SDR-Private-In' `
+    -DisplayName 'CORNET - SDR and Smart Plug Private LAN' `
+    -Description 'Allows inbound traffic from USRP SDRs and smart plugs (192.168.0.0/16).' `
     -Direction Inbound `
     -Action Allow `
-    -RemoteAddress "192.168.0.0/16" `
+    -RemoteAddress '192.168.0.0/16' `
     -Profile Any `
     -Enabled True | Out-Null
-Write-Host "    [✓] Allowed private SDR and smart plug traffic (192.168.0.0/16)." -ForegroundColor Green
+Write-Host "    [OK] Allowed private SDR and smart plug traffic (192.168.0.0/16)." -ForegroundColor Green
 
 # -----------------------------------------------------------------------------
 # 6. Verification
 # -----------------------------------------------------------------------------
-Write-Host "`n=== Active CORNET Firewall Rules ===" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "=== Active CORNET Firewall Rules ===" -ForegroundColor Cyan
 Get-NetFirewallRule -Name "CORNET-*" | `
     Format-Table Name, DisplayName, Enabled, Direction, Action -AutoSize
 
-Write-Host "[✓] Windows Defender Firewall successfully hardened for CORNET." -ForegroundColor Green
-Write-Host "    Remote Desktop and SSH are now strictly restricted to campus and VPN subnets.`n" -ForegroundColor Green
+Write-Host "[OK] Windows Defender Firewall successfully hardened for CORNET." -ForegroundColor Green
+Write-Host "    Remote Desktop and SSH are now strictly restricted to campus and VPN subnets." -ForegroundColor Green
+Write-Host ""

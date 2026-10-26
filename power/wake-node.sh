@@ -24,6 +24,7 @@ if [[ -z "$TARGET" ]]; then
     echo "  wvt-wstation1-ubuntu   : ac:b4:80:3a:3a:82"
     echo "  wvt-wstation3-ubuntu   : ac:b4:80:3a:3a:51"
     echo "  wvt-nuc-02             : 58:47:ca:7c:1d:75"
+    echo "  wvt465-xeon            : 34:17:eb:de:5c:dd"
     exit 1
 fi
 
@@ -33,6 +34,7 @@ case "${TARGET,,}" in
     wvt-wstation1*|wstation1)     MAC="ac:b4:80:3a:3a:82" ;;
     wvt-wstation3*|wstation3)     MAC="ac:b4:80:3a:3a:51" ;;
     wvt-nuc-02*|nuc-02|nuc2)      MAC="58:47:ca:7c:1d:75" ;;
+    wvt465-xeon*|xeon*)           MAC="34:17:eb:de:5c:dd" ;;
     *)                            MAC="$TARGET" ;;
 esac
 

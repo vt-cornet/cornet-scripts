@@ -27,5 +27,16 @@ Scripts for configuring, managing, and triggering remote power on CORNET lab wor
 - **Examples:**
   ```bash
   ./wake-node.sh wvt-wstation1 128.173.94.255
-  ./wake-node.sh ac:b4:80:3a:3a:9e 128.173.94.255
+  ./wake-node.sh wvt465-xeon 128.173.94.255
+  ./wake-node.sh 34:17:eb:de:5c:dd 128.173.94.255
   ```
+
+### Verified Workstation MAC Address Table
+
+| Hostname | Primary Interface | MAC Address | OS |
+| :--- | :--- | :--- | :--- |
+| `wvt-pratheek-pc-ubuntu` | `enp128s31f6` | `ac:b4:80:3a:3a:9e` | Ubuntu 24.04 / Windows Dual-Boot |
+| `wvt-wstation1-ubuntu` | `enp128s31f6` | `ac:b4:80:3a:3a:82` | Ubuntu 24.04 / Windows Dual-Boot |
+| `wvt-wstation3-ubuntu` | `enp128s31f6` | `ac:b4:80:3a:3a:51` | Ubuntu 24.04 |
+| `wvt-nuc-02` | `enp0s31f6` | `58:47:ca:7c:1d:75` | Ubuntu 24.04 |
+| `wvt465-xeon` | `Ethernet (I217-LM)` | `34:17:eb:de:5c:dd` | Windows 10 |
