@@ -25,9 +25,10 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │       ├── update-ddns.ps1     # Windows PowerShell updater
 │       └── CORNET-DDNS-Update.xml # Windows Task Scheduler definition
 │
-├── firewall/                   # Declarative Proxmox VE firewall configurations
+├── firewall/                   # Declarative Proxmox VE & workstation firewall configurations
 │   ├── README.md               # Firewall architecture, IPSETs, and deployment guide
 │   ├── cluster.fw              # Datacenter-level rules & approved subnet IPSETs
+│   ├── setup-workstation-firewall.sh # Replicates cluster security on Ubuntu workstations (UFW)
 │   └── guests/                 # Per-VM and per-container firewall rules
 │       ├── 200.fw              # DNS Server (LXC 200)
 │       ├── 210.fw              # PXE Provisioning Server (LXC 210)

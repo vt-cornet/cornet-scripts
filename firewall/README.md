@@ -75,3 +75,21 @@ scp firewall/cluster.fw root@198.82.18.154:/etc/pve/firewall/cluster.fw
 # Push guest configuration (e.g. for container 200)
 scp firewall/guests/200.fw root@198.82.18.154:/etc/pve/firewall/200.fw
 ```
+
+---
+
+## Workstation Firewall Setup (`setup-workstation-firewall.sh`)
+
+To replicate the exact cluster security posture on Ubuntu lab workstations (`wvt-pratheek-pc`, `wvt-wstation1`, `wvt-wstation3`, `wvt-nuc-02`):
+
+[`setup-workstation-firewall.sh`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/firewall/setup-workstation-firewall.sh):
+- Enforces `default deny incoming` and `default allow outgoing`.
+- Restricts SSH (`22/tcp`) and RDP (`3389/tcp`) strictly to the 10 approved campus/VPN subnets.
+- Permits all traffic on `tailscale0` (if present).
+- Automatically detects and allows traffic on dedicated high-speed USRP SDR interfaces (e.g. `*f0np0`, `*f1np1`, `enp47s0`).
+
+**Usage on any workstation:**
+```bash
+sudo ./setup-workstation-firewall.sh
+```
+
