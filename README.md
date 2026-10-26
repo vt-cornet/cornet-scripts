@@ -49,10 +49,15 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │   ├── README.md               # Architecture, TLS certificate setup, and troubleshooting
 │   └── setup-gnome-rdp-system.sh # Automated system-level daemon, TLS, and grdctl config
 │
+├── sdr-control/                # Software Defined Radio (SDR) hardware power & diagnostics
+│   ├── README.md               # Architecture guide for Ettus X310 and N310 SDRs
+│   ├── n310-ctl.sh             # USRP N310 safe shutdown, reboot, detection & MCU powerbtn simulation
+│   └── x310-ctl.sh             # USRP X310 Shelly smart plug AC relay control
+│
 └── tools/                      # Lab workstation utilities
     ├── README.md               # Documentation for workstation tools
     ├── boot-windows.sh         # Dual-boot EFI switcher to reboot directly into Windows
-    └── x310-ctl.sh             # USRP X310 smart plug AC power control
+    └── x310-ctl.sh             # Symlink to sdr-control/x310-ctl.sh
 ```
 
 ---
