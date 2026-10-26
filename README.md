@@ -46,7 +46,7 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │   └── wake-node.sh            # Remote MagicPacket wake trigger CLI
 │
 ├── remote-desktop/             # Ubuntu GNOME Remote Desktop (RDP) automation
-│   ├── README.md               # Architecture, FreeRDP package pinning, and troubleshooting
+│   ├── README.md               # Architecture, TLS certificate setup, and troubleshooting
 │   └── setup-gnome-rdp-system.sh # Automated system-level daemon, TLS, and grdctl config
 │
 └── tools/                      # Lab workstation utilities

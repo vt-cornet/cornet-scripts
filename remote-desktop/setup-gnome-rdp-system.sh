@@ -7,11 +7,10 @@
 #
 # What this script does:
 #   1. Installs gnome-remote-desktop and dependencies if missing.
-#   2. Pins FreeRDP / WinPR packages (apt-mark hold) to prevent handshake regressions.
-#   3. Generates system-wide TLS certificates with explicit daemon ownership.
-#   4. Registers configuration via 'grdctl --system' non-interactively.
-#   5. Permanently masks/suppresses per-user daemons across all user accounts.
-#   6. Enables and restarts the system-wide gnome-remote-desktop service.
+#   2. Generates system-wide TLS certificates with explicit daemon ownership.
+#   3. Registers configuration via 'grdctl --system' non-interactively.
+#   4. Permanently masks/suppresses per-user daemons across all user accounts.
+#   5. Enables and restarts the system-wide gnome-remote-desktop service.
 #
 # Usage:
 #   sudo ./setup-gnome-rdp-system.sh <USERNAME> <RDP_PASSWORD>
@@ -48,16 +47,7 @@ echo "[+] Step 1: Installing required packages..."
 apt-get update -qq
 apt-get install -y -qq gnome-remote-desktop openssl
 
-echo "[+] Step 2: Pinning FreeRDP/WinPR packages to prevent upgrade regressions..."
-FREERDP_PKGS=$(dpkg-query -W -f='${Package}\n' 'libfreerdp*' 'libwinpr*' 2>/dev/null || true)
-if [[ -n "$FREERDP_PKGS" ]]; then
-    for pkg in $FREERDP_PKGS; do
-        apt-mark hold "$pkg" >/dev/null
-        echo "    [*] Held package: $pkg"
-    done
-fi
-
-echo "[+] Step 3: Generating system-wide TLS certificate..."
+echo "[+] Step 2: Generating system-wide TLS certificate..."
 mkdir -p /etc/gnome-remote-desktop
 CERT_PATH="/etc/gnome-remote-desktop/rdp-tls.crt"
 KEY_PATH="/etc/gnome-remote-desktop/rdp-tls.key"
@@ -76,14 +66,14 @@ chmod 600 "$KEY_PATH"
 chmod 644 "$CERT_PATH"
 echo "[✓] TLS certificate generated at $CERT_PATH"
 
-echo "[+] Step 4: Registering system-level RDP settings via grdctl..."
+echo "[+] Step 3: Registering system-level RDP settings via grdctl..."
 grdctl --system rdp set-tls-cert "$CERT_PATH"
 grdctl --system rdp set-tls-key "$KEY_PATH"
 grdctl --system rdp set-credentials "$TARGET_USER" "$RDP_PASSWORD"
 grdctl --system rdp disable-view-only
 grdctl --system rdp enable
 
-echo "[+] Step 5: Permanently suppressing per-user daemon instances..."
+echo "[+] Step 4: Permanently suppressing per-user daemon instances..."
 # Mask globally for all existing and future user sessions
 systemctl --global disable gnome-remote-desktop.service 2>/dev/null || true
 systemctl --global mask gnome-remote-desktop.service 2>/dev/null || true
@@ -91,7 +81,7 @@ systemctl --global mask gnome-remote-desktop.service 2>/dev/null || true
 # Stop active per-user instances for logged-in users if running
 pkill -u "$TARGET_USER" gnome-remote-desktop-daemon 2>/dev/null || true
 
-echo "[+] Step 6: Enabling and starting system service..."
+echo "[+] Step 5: Enabling and starting system service..."
 systemctl daemon-reload
 systemctl enable gnome-remote-desktop.service
 systemctl restart gnome-remote-desktop.service
