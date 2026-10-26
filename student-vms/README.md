@@ -7,10 +7,10 @@ Build and operations guide for the per-student KVM VMs used in the *Advanced Cel
 The workflow is: build one **golden VM**, seal it, convert it to a **template**, then **clone** one VM per
 student. Everything below was built and validated on `cornet-node04` on 2026-10-12/13.
 
-> **Status when this was written (fill in / verify before committing):**
-> golden template `9040` built and sealed; `advcell-vm1` (VM 100) fully validated; `advcell-vm2` (VM 101)
-> required a re-clone after an interrupted copy (see Troubleshooting); `advcell-vm3` (VM 102) was the spare.
-> Results for VM 101/102 were not captured in the source notes: `[ ]` confirm.
+> **Production Status:**
+> Golden template `9040` (`advcell-golden-2604`) and backup `9099` (`advcell-golden-2604-bak`) are sealed on `cornet-node04`.
+> Active student VMs `advcell-vm1` (VM 100, `.211`), `advcell-vm2` (VM 101, `.212`), `advcell-vm3` (VM 102, `.213`), and `advcell-vm4` (VM 103, `.214`)
+> are fully deployed, running Ubuntu 26.04.1 LTS with QEMU guest agent, CPU affinities pinned, and GNOME Remote Desktop enabled.
 
 ---
 
