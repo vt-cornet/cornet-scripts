@@ -1,0 +1,53 @@
+#cloud-config
+# ==============================================================================
+# File: provisioning/user-data.template
+# Purpose: Subiquity Unattended Autoinstall Seed for Dell Pro Max T2 Towers
+# ==============================================================================
+# Served by: LXC 210 (198.82.18.151) at /srv/autoinstall/<MACHINE>/user-data
+# (An empty 0-byte 'meta-data' file MUST also reside in the same directory).
+#
+# Proven on: wvt-wstation1, wvt-wstation2, wvt-pratheek-pc
+#
+# Hardware Targets:
+#   - Primary NVMe (Micron 256GB): Windows 10/11 (untouched)
+#   - Secondary NVMe (Samsung 990 PRO 1TB): Ubuntu Target (matched by 'size: largest')
+#
+# Important Rules Learned from Field Testing:
+#   1. 'size: largest' wipes the 1TB Samsung and preserves the 256GB Windows disk.
+#   2. 'drivers: install: false' prevents unattended hangs on Secure Boot MOK prompts.
+#   3. Do NOT add 'ubuntu-desktop' under packages: (triggers Subiquity crash exit 100).
+#      Install desktop manually over SSH after first boot.
+#   4. Do NOT use heredocs in late-commands (produces syntax errors).
+# ==============================================================================
+
+autoinstall:
+  version: 1
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+  timezone: America/New_York
+  identity:
+    hostname: <MACHINE>-ubuntu
+    username: pratheek
+    password: "<PASSWORD_HASH>"
+  ssh:
+    install-server: true
+    authorized-keys:
+      - <SSH_PUBLIC_KEY>
+    allow-pw: false
+  storage:
+    layout:
+      name: direct
+      match:
+        size: largest
+  drivers:
+    install: false
+  updates: security
+  refresh-installer:
+    update: false
+  reporting:
+    cornet:
+      type: webhook
+      endpoint: http://198.82.18.151:5001/install-status/<MACHINE>
+  interactive-sections: []
+  shutdown: reboot

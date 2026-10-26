@@ -48,6 +48,16 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │   ├── enable-wol.sh           # Persistent workstation WoL configuration (systemd-networkd/NM)
 │   └── wake-node.sh            # Remote MagicPacket wake trigger CLI
 │
+├── provisioning/               # Bare-metal UEFI PXE autoinstall for Dell T2 workstations
+│   ├── README.md               # Complete architecture, Serva config, pre-flight & recovery guide
+│   ├── status-api.py           # Subiquity install-status webhook logger (Port 5001 on LXC 210)
+│   ├── status-api.service      # Systemd service unit for status-api.py
+│   ├── user-data.template      # Subiquity unattended autoinstall seed (size: largest)
+│   ├── grub.cfg.template       # Serva GRUB netboot menu (ramdisk_size=6G, quoted ds=)
+│   ├── switch-ahci.ps1         # Windows AHCI driver pre-staging & CCTK BIOS storage switch
+│   ├── trigger-pxe.ps1         # Windows one-time UEFI PXE boot arming CLI (CCTK/bcdedit)
+│   └── recover-boot-lockout.ps1# WSL2 ext4 raw mount rescue script for Windows boot loops
+│
 ├── remote-desktop/             # Ubuntu GNOME Remote Desktop (RDP) automation
 │   ├── README.md               # Architecture, TLS certificate setup, and troubleshooting
 │   ├── setup-gnome-rdp-system.sh # Automated system-level daemon, TLS, and grdctl config
@@ -100,3 +110,10 @@ Declarative rules applied via Proxmox cluster filesystem (`/etc/pve/firewall/`):
 - Restricts cluster management ports (SSH `22`, GUI `8006`) to `approved-subnets`.
 - Restricts Corosync cluster heartbeat traffic (`5405:5406/udp`) to verified `cluster-nodes`.
 - Isolates guest VMs from cluster management interfaces with MAC/IP anti-spoofing filters.
+
+### 4. Bare-Metal PXE Provisioning ([`provisioning/`](provisioning/))
+Automates unattended bare-metal UEFI PXE deployment of Ubuntu onto Dell Pro Max Tower T2 workstations:
+- **Cross-Subnet PXE Relay:** Local DHCP/TFTP serving from `wvt465-xeon` via Serva to bypass campus DHCP relay limitations.
+- **Hardware Pre-staging:** Registry preparation and Dell CCTK storage mode switching from RAID (Intel VMD) to AHCI.
+- **Subiquity Autoinstall:** Automated seed delivery (`user-data`) with live HTTP webhook progress telemetry to LXC 210.
+- **Dual-Boot Safety:** Safe one-time boot switching via `boot-windows` and WSL2 physical disk rescue script for Windows boot loops.

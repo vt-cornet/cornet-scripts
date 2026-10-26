@@ -21,7 +21,12 @@ WIN_BOOT=$(efibootmgr | grep -i "Windows Boot Manager" | sed -n 's/Boot\([0-9A-F
 if [ -n "$WIN_BOOT" ]; then
     echo "Setting next boot to Windows (Boot$WIN_BOOT) and rebooting..."
     efibootmgr -n "$WIN_BOOT"
-    reboot
+    # Use systemctl reboot -i so active SSH or desktop sessions do not inhibit the reboot
+    if command -v systemctl >/dev/null 2>&1; then
+        systemctl reboot -i
+    else
+        reboot
+    fi
 else
     echo "Error: Windows Boot Manager entry not found in EFI boot manager." >&2
     exit 1

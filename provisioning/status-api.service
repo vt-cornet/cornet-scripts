@@ -1,0 +1,13 @@
+[Unit]
+Description=CORNET Subiquity Autoinstall Status Logger
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/python3 /opt/status-api.py
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

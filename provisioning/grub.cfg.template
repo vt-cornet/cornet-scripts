@@ -1,0 +1,24 @@
+# ==============================================================================
+# File: provisioning/grub.cfg.template
+# Purpose: Serva UEFI GRUB Boot Menu for Network Autoinstall
+# ==============================================================================
+# Deployed to: C:\Serva\netboot\amd64\grub\grub.cfg on wvt465-xeon (128.173.94.81)
+# TFTP Root:   C:\Serva\netboot\amd64\
+#
+# Critical Syntax Rules:
+#   1. Double quotes around the "ds=nocloud-net;s=..." argument are MANDATORY.
+#      Unquoted, GRUB treats ';' as a command separator, causing the installer
+#      to drop to the interactive language selection screen.
+#   2. ramdisk_size=6G is MANDATORY. With smaller allocations (e.g. 4G), the
+#      kernel virtual ramdisk runs out of space during ISO unpacking:
+#      'wget: short write: No space left on device'.
+#   3. Target hardware must have at least 8 GB of physical RAM.
+# ==============================================================================
+
+set timeout=5
+
+menuentry "Install Ubuntu 26.04 - <MACHINE> (CORNET Autoinstall via Serva)" {
+    set gfxpayload=keep
+    linux linux ramdisk_size=6G iso-url=https://releases.ubuntu.com/26.04/ubuntu-26.04-live-server-amd64.iso ip=dhcp autoinstall "ds=nocloud-net;s=http://198.82.18.151/autoinstall/<MACHINE>/" ---
+    initrd initrd
+}
