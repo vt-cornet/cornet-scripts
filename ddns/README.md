@@ -48,7 +48,8 @@ ddns/
     ├── setup-ddns-client.sh   # One-line client onboarding & systemd installer
     ├── update-ddns.sh         # Linux updater (Hardened Multi-Interface Edition)
     ├── cornet-ddns.service    # Linux systemd boot service
-    ├── update-ddns.ps1        # Windows PowerShell updater (with boot retry loop)
+    ├── update-ddns.ps1        # Windows PowerShell updater (Dual-boot workstations)
+    ├── update-ddns-xeon.ps1   # Windows PowerShell updater (Dedicated for wvt465-xeon)
     └── CORNET-DDNS-Update.xml # Windows Task Scheduler definition
 ```
 
@@ -154,18 +155,30 @@ curl -sSL https://raw.githubusercontent.com/vt-cornet/cornet-scripts/main/ddns/c
 
 ## Client Scripts (Windows)
 
-- **Script:** [`client/update-ddns.ps1`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/ddns/client/update-ddns.ps1) (deployed to `C:\ProgramData\CORNET\update-ddns.ps1`)
+The repository maintains two separate Windows client updaters based on workstation deployment:
+
+1. **Dual-Boot Workstations ([`client/update-ddns.ps1`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/ddns/client/update-ddns.ps1)):**
+   - Designed for dual-boot machines (`wvt-pratheek-pc-win`, `wvt-wstation1-win`, `wvt-wstation2-win`).
+   - Automatically derives the lowercase computer name and includes a 5-attempt retry loop to handle delayed DHCP on boot.
+
+2. **Xeon Workstation ([`client/update-ddns-xeon.ps1`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/ddns/client/update-ddns-xeon.ps1)):**
+   - Dedicated script deployed on `wvt465-xeon` (`128.173.94.81`).
+   - Explicitly registers `wvt465-xeon` (matching the DNS whitelist even though the local Windows computer name is `PRATHEEK-REMOTE`).
+
 - **Task Scheduler XML:** [`client/CORNET-DDNS-Update.xml`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/ddns/client/CORNET-DDNS-Update.xml)
 
 ### Installation on Windows Workstation
 
-1. Place the script in `C:\ProgramData\CORNET\update-ddns.ps1`:
+1. Place the appropriate script in `C:\ProgramData\CORNET\update-ddns.ps1`:
    ```powershell
    New-Item -ItemType Directory -Path "C:\ProgramData\CORNET" -Force
+   # For dual-boot workstations:
    Copy-Item .\update-ddns.ps1 -Destination "C:\ProgramData\CORNET\update-ddns.ps1"
+   # For wvt465-xeon:
+   Copy-Item .\update-ddns-xeon.ps1 -Destination "C:\ProgramData\CORNET\update-ddns.ps1"
    ```
 
-2. Register the Windows Scheduled Task (runs on boot as `SYSTEM`):
+2. Register the Windows Scheduled Task (runs on boot and every 3 hours as `SYSTEM`):
    ```cmd
    schtasks /Create /TN "CORNET-DDNS-Update" /XML "CORNET-DDNS-Update.xml" /F
    ```

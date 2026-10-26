@@ -24,7 +24,8 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │       ├── setup-ddns-client.sh # One-line client onboarding & systemd installer
 │       ├── update-ddns.sh      # Linux bash updater (Hardened Multi-Interface Edition)
 │       ├── cornet-ddns.service # Linux systemd service unit
-│       ├── update-ddns.ps1     # Windows PowerShell updater
+│       ├── update-ddns.ps1     # Windows PowerShell updater (Dual-boot workstations)
+│       ├── update-ddns-xeon.ps1# Windows PowerShell updater (Dedicated for wvt465-xeon)
 │       └── CORNET-DDNS-Update.xml # Windows Task Scheduler definition
 │
 ├── firewall/                   # Declarative Proxmox VE & workstation firewall configurations
