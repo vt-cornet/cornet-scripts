@@ -1,0 +1,9 @@
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[RULES]
+IN ACCEPT -source +approved-subnets -p tcp -dport 22 # SSH - approved subnets only
+IN ACCEPT -source +approved-subnets -p udp -dport 41641 # Headscale/Tailscale WireGuard data port
+IN ACCEPT -source +approved-subnets -p tcp -dport 8080 # Headscale control API (HTTP, pre-TLS)

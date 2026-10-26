@@ -1,0 +1,13 @@
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[RULES]
+IN ACCEPT -source +approved-subnets -p tcp -dport 21115 # RustDesk NAT test - approved subnets only
+IN ACCEPT -source +approved-subnets -p tcp -dport 21116 # RustDesk hbbs registration/heartbeat - approved subnets only
+IN ACCEPT -source +approved-subnets -p udp -dport 21116 # RustDesk hbbs heartbeat UDP - approved subnets only
+IN ACCEPT -source +approved-subnets -p tcp -dport 21117 # RustDesk hbbr relay - approved subnets only
+IN ACCEPT -source +approved-subnets -p tcp -dport 21118 # RustDesk hbbs websocket - approved subnets only
+IN ACCEPT -source +approved-subnets -p tcp -dport 21119 # RustDesk hbbr websocket - approved subnets only
+IN ACCEPT -source +approved-subnets -p tcp -dport 22 # SSH - approved subnets only

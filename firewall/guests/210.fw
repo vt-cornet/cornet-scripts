@@ -1,0 +1,11 @@
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[RULES]
+IN ACCEPT -p udp -dport 67:68 # DHCP - no source restriction (clients use 0.0.0.0 before getting a lease)
+IN ACCEPT -source +approved-subnets -p udp -dport 69 # TFTP - approved subnets only
+IN ACCEPT -source +approved-subnets -p tcp -dport 80 # HTTP - approved subnets only
+IN ACCEPT -source +approved-subnets -p tcp -dport 22 # SSH - approved subnets only
+IN ACCEPT -source +approved-subnets -p tcp -dport 5001 # Install status logger - approved subnets only

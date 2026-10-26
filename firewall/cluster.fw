@@ -1,0 +1,31 @@
+[OPTIONS]
+
+policy_in: DROP
+enable: 1
+
+[IPSET approved-subnets]
+
+128.173.52.0/24
+128.173.88.0/21
+172.27.0.0/16
+172.29.0.0/16
+172.30.0.0/16
+198.82.18.128/26
+198.82.8.0/21 # Campus VPN Subnet
+45.3.120.0/22
+45.3.124.0/23
+45.3.126.0/23
+
+[IPSET cluster-nodes]
+
+128.173.88.72
+128.173.88.73
+198.82.18.154
+198.82.18.155
+
+[RULES]
+
+IN ACCEPT -source +cluster-nodes -p udp -dport 5405:5406 # Corosync cluster communication
+IN ACCEPT -source +approved-subnets -p tcp -dport 22 # SSH - approved subnets
+IN ACCEPT -source +approved-subnets -p tcp -dport 8006 # Proxmox GUI - approved subnets
+

@@ -1,0 +1,9 @@
+[OPTIONS]
+
+enable: 1
+policy_in: DROP
+
+[RULES]
+
+IN ACCEPT -source +approved-subnets -p tcp -dport 22 # SSH - approved subnets only
+IN ACCEPT -source +approved-subnets -p tcp -dport 3389 # RDP - approved subnets only

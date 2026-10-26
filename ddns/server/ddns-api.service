@@ -1,0 +1,19 @@
+[Unit]
+Description=CORNET Dynamic DNS Update API
+After=network.target dnsmasq.service
+Wants=dnsmasq.service
+
+[Service]
+Type=simple
+User=ddns-updater
+Group=ddns-updater
+WorkingDirectory=/opt/ddns-api
+EnvironmentFile=-/etc/default/ddns-api
+ExecStart=/usr/local/bin/gunicorn -w 2 -b 0.0.0.0:5000 --worker-tmp-dir /tmp app:app
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/ddns-api.log
+StandardError=append:/var/log/ddns-api.log
+
+[Install]
+WantedBy=multi-user.target

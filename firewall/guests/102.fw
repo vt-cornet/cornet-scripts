@@ -1,0 +1,17 @@
+[OPTIONS]
+enable: 1
+dhcp: 1
+macfilter: 1
+ipfilter: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[IPSET ipfilter-net0]
+128.173.88.213
+
+[RULES]
+IN DROP -source +dc/cluster-nodes
+OUT DROP -dest +dc/cluster-nodes
+IN ACCEPT -source +dc/approved-subnets -p tcp -dport 22
+IN ACCEPT -source +dc/approved-subnets -p tcp -dport 3389
+IN ACCEPT -source +dc/approved-subnets -p icmp
