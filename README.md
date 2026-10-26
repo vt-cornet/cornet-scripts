@@ -57,6 +57,7 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 └── tools/                      # Lab workstation utilities
     ├── README.md               # Documentation for workstation tools
     ├── boot-windows.sh         # Dual-boot EFI switcher to reboot directly into Windows
+    ├── setup-workstation-tuning.sh # Automated kernel, power, network & chrony NTP tuning
     └── x310-ctl.sh             # Symlink to sdr-control/x310-ctl.sh
 ```
 
