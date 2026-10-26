@@ -45,6 +45,7 @@ ddns/
 │   ├── dnsmasq.conf           # Authoritative dnsmasq configuration & static records
 │   └── requirements.txt       # Python dependencies (Flask, gunicorn)
 └── client/
+    ├── setup-ddns-client.sh   # One-line client onboarding & systemd installer
     ├── update-ddns.sh         # Linux updater (Hardened Multi-Interface Edition)
     ├── cornet-ddns.service    # Linux systemd boot service
     ├── update-ddns.ps1        # Windows PowerShell updater (with boot retry loop)
@@ -128,21 +129,22 @@ Only pre-registered hostnames in `app.py` may be updated:
 
 The workstation client scripts publish the machine's dynamic IP to the DDNS server on boot.
 
+- **Automated Installer:** [`client/setup-ddns-client.sh`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/ddns/client/setup-ddns-client.sh)
 - **Script:** [`client/update-ddns.sh`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/ddns/client/update-ddns.sh) (deployed to `/opt/cornet/update-ddns.sh`)
 - **Systemd Service:** [`client/cornet-ddns.service`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/ddns/client/cornet-ddns.service) (deployed to `/etc/systemd/system/cornet-ddns.service`)
 
-### Installation on Ubuntu Workstation
+### Automated One-Line Installation on Ubuntu Workstation
+
+Run this single command on the workstation to install the script, register the systemd service, and perform an immediate test:
 
 ```bash
-sudo mkdir -p /opt/cornet
-sudo cp update-ddns.sh /opt/cornet/update-ddns.sh
-sudo chmod +x /opt/cornet/update-ddns.sh
+# If cloned locally:
+sudo ./ddns/client/setup-ddns-client.sh [OPTIONAL_CUSTOM_HOSTNAME]
 
-sudo cp cornet-ddns.service /etc/systemd/system/cornet-ddns.service
-sudo systemctl daemon-reload
-sudo systemctl enable cornet-ddns.service
-sudo systemctl start cornet-ddns.service
+# Or via one-line curl:
+curl -sSL https://raw.githubusercontent.com/vt-cornet/cornet-scripts/main/ddns/client/setup-ddns-client.sh | sudo bash
 ```
+
 
 ### Evolution / Version Differences
 - **Initial Version (`wvt-pratheek-pc-ubuntu`):** Performed a single instantaneous `curl` POST on boot.

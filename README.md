@@ -21,6 +21,7 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │   │   ├── dnsmasq.conf        # Authoritative dnsmasq configuration & static records
 │   │   └── requirements.txt    # Python dependencies
 │   └── client/                 # Periodic boot updater scripts for lab workstations
+│       ├── setup-ddns-client.sh # One-line client onboarding & systemd installer
 │       ├── update-ddns.sh      # Linux bash updater (Hardened Multi-Interface Edition)
 │       ├── cornet-ddns.service # Linux systemd service unit
 │       ├── update-ddns.ps1     # Windows PowerShell updater
@@ -43,6 +44,10 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │   ├── README.md               # WoL setup instructions, BIOS prerequisites, and wake guide
 │   ├── enable-wol.sh           # Persistent workstation WoL configuration (systemd-networkd/NM)
 │   └── wake-node.sh            # Remote MagicPacket wake trigger CLI
+│
+├── remote-desktop/             # Ubuntu GNOME Remote Desktop (RDP) automation
+│   ├── README.md               # Architecture, FreeRDP package pinning, and troubleshooting
+│   └── setup-gnome-rdp-system.sh # Automated system-level daemon, TLS, and grdctl config
 │
 └── tools/                      # Lab workstation utilities
     ├── README.md               # Documentation for workstation tools
