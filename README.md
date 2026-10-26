@@ -26,7 +26,8 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │       ├── cornet-ddns.service # Linux systemd service unit
 │       ├── update-ddns.ps1     # Windows PowerShell updater (Dual-boot workstations)
 │       ├── update-ddns-xeon.ps1# Windows PowerShell updater (Dedicated for wvt465-xeon)
-│       └── CORNET-DDNS-Update.xml # Windows Task Scheduler definition
+│       ├── CORNET-DDNS-Update.xml # Windows Task Scheduler XML (On-boot trigger)
+│       └── CORNET-DDNS-Update-Xeon.xml # Windows Task Scheduler XML (3-hour repeating trigger)
 │
 ├── firewall/                   # Declarative Proxmox VE & workstation firewall configurations
 │   ├── README.md               # Firewall architecture, IPSETs, and deployment guide

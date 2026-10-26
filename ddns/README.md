@@ -50,7 +50,8 @@ ddns/
     ├── cornet-ddns.service    # Linux systemd boot service
     ├── update-ddns.ps1        # Windows PowerShell updater (Dual-boot workstations)
     ├── update-ddns-xeon.ps1   # Windows PowerShell updater (Dedicated for wvt465-xeon)
-    └── CORNET-DDNS-Update.xml # Windows Task Scheduler definition
+    ├── CORNET-DDNS-Update.xml # Windows Task Scheduler definition (On-boot trigger)
+    └── CORNET-DDNS-Update-Xeon.xml # Windows Task Scheduler definition (3-hour repeating trigger)
 ```
 
 ---
@@ -169,18 +170,20 @@ The repository maintains two separate Windows client updaters based on workstati
 
 ### Installation on Windows Workstation
 
-1. Place the appropriate script in `C:\ProgramData\CORNET\update-ddns.ps1`:
+1. **For Dual-Boot Workstations (`wvt-pratheek-pc-win`, `wvt-wstation1-win`):**
+   Runs as a **one-shot on boot** via `<BootTrigger>`:
    ```powershell
    New-Item -ItemType Directory -Path "C:\ProgramData\CORNET" -Force
-   # For dual-boot workstations:
    Copy-Item .\update-ddns.ps1 -Destination "C:\ProgramData\CORNET\update-ddns.ps1"
-   # For wvt465-xeon:
-   Copy-Item .\update-ddns-xeon.ps1 -Destination "C:\ProgramData\CORNET\update-ddns.ps1"
+   schtasks /Create /TN "CORNET-DDNS-Update" /XML "CORNET-DDNS-Update.xml" /F
    ```
 
-2. Register the Windows Scheduled Task (runs on boot and every 3 hours as `SYSTEM`):
-   ```cmd
-   schtasks /Create /TN "CORNET-DDNS-Update" /XML "CORNET-DDNS-Update.xml" /F
+2. **For Dedicated Xeon Workstation (`wvt465-xeon`):**
+   Runs **every 3 hours** via `TimeTrigger` (`PT3H`) to maintain registration on the 24/7 standalone host:
+   ```powershell
+   New-Item -ItemType Directory -Path "C:\ProgramData\CORNET" -Force
+   Copy-Item .\update-ddns-xeon.ps1 -Destination "C:\ProgramData\CORNET\update-ddns.ps1"
+   schtasks /Create /TN "CORNET-DDNS-Update" /XML "CORNET-DDNS-Update-Xeon.xml" /F
    ```
 
 
