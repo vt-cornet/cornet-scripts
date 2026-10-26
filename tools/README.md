@@ -37,3 +37,18 @@ Utility scripts deployed across CORNET lab workstations and hardware controllers
   ```bash
   sudo ./tools/setup-workstation-tuning.sh
   ```
+
+---
+
+### 4. [`setup-windows-ssh.ps1`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/tools/setup-windows-ssh.ps1) — Windows OpenSSH Server Setup & Key Authorization
+- **Location on Host:** Run in PowerShell as Administrator on Windows 10/11
+- **Purpose:** 
+  1. Installs the native Windows `OpenSSH.Server` capability.
+  2. Sets `sshd` service to automatic startup and starts the service.
+  3. Pre-authorizes the lab ED25519 SSH public key in both `C:\ProgramData\ssh\administrators_authorized_keys` and the user profile `~\.ssh\authorized_keys`.
+  4. Enforces strict NTFS permissions (inheritance removed; full control granted exclusively to `SYSTEM` and `Administrators`) to satisfy OpenSSH security requirements.
+  5. Opens port 22 in Windows Defender Firewall.
+- **Usage (PowerShell as Admin):**
+  ```powershell
+  powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/vt-cornet/cornet-scripts/main/tools/setup-windows-ssh.ps1 | iex"
+  ```

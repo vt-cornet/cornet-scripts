@@ -80,6 +80,7 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
     ├── README.md               # Documentation for workstation tools
     ├── boot-windows.sh         # Dual-boot EFI switcher to reboot directly into Windows
     ├── setup-workstation-tuning.sh # Automated kernel, power, network & chrony NTP tuning
+    ├── setup-windows-ssh.ps1   # Windows OpenSSH Server setup & key authorization
     └── x310-ctl.sh             # Symlink to sdr-control/x310-ctl.sh
 ```
 
