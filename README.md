@@ -48,7 +48,8 @@ Automation scripts, Dynamic DNS service, and declarative firewall configurations
 │
 ├── remote-desktop/             # Ubuntu GNOME Remote Desktop (RDP) automation
 │   ├── README.md               # Architecture, TLS certificate setup, and troubleshooting
-│   └── setup-gnome-rdp-system.sh # Automated system-level daemon, TLS, and grdctl config
+│   ├── setup-gnome-rdp-system.sh # Automated system-level daemon, TLS, and grdctl config
+│   └── fix-gnome-rdp.sh        # FreeRDP library rollback & macOS client handshake fix
 │
 ├── sdr-control/                # Software Defined Radio (SDR) hardware power & diagnostics
 │   ├── README.md               # Architecture guide for Ettus X310 and N310 SDRs

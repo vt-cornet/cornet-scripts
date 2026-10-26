@@ -40,3 +40,28 @@ sudo ./setup-gnome-rdp-system.sh pratheek "MySecretPassword"
 - **Username:** `<USERNAME>`
 - **Password:** `<RDP_PASSWORD>`
 - **Security:** In Microsoft Remote Desktop, accept the self-signed TLS certificate prompt.
+
+---
+
+## FreeRDP Rollback & macOS Fix ([`fix-gnome-rdp.sh`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/remote-desktop/fix-gnome-rdp.sh))
+
+Upstream updates to FreeRDP 3.32+ introduce a known TLS handshake / protocol negotiation regression with Microsoft Remote Desktop (macOS Windows App), causing connections to instantly fail with error codes `0x204` or `0x104`.
+
+[`fix-gnome-rdp.sh`](file:///Users/pratheek/Projects/CodeBase%20Walkthroughs/cornet-scripts/remote-desktop/fix-gnome-rdp.sh) resolves this issue by:
+1. Clearing any existing apt holds.
+2. Rolling back `libfreerdp*` and `libwinpr*` packages to verified working builds:
+   - **Ubuntu 24.04:** `3.31.0+dfsg-0ubuntu0.24.04.1` (fetched from the official Ubuntu snapshot archive).
+   - **Ubuntu 26.04:** `3.24.2+dfsg-1ubuntu1` (via `apt --allow-downgrades`).
+3. Pinning the packages (`apt-mark hold`) so automated `apt upgrade` cycles do not re-introduce the regression.
+4. Purging mismatched `winpr-utils` packages.
+5. Regenerating TLS certificates and restarting GNOME Remote Desktop.
+
+### Usage
+
+```bash
+# Local execution:
+sudo ./remote-desktop/fix-gnome-rdp.sh
+
+# Or direct one-line run:
+curl -sSL https://raw.githubusercontent.com/vt-cornet/cornet-scripts/main/remote-desktop/fix-gnome-rdp.sh | sudo bash
+```
