@@ -14,9 +14,9 @@
 
 #Requires -RunAsAdministrator
 
-param(
-    [string]$PublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMNVMN2kfORvPG75AQnjSl61N8dX1eNYx4EtZHfZGBxY pratheek@cornet"
-)
+if (-not $PublicKey) {
+    $PublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMNVMN2kfORvPG75AQnjSl61N8dX1eNYx4EtZHfZGBxY pratheek@cornet"
+}
 
 $ErrorActionPreference = "Stop"
 
