@@ -59,7 +59,7 @@ Subnets authorized to access administrative interfaces (SSH, Web GUI) and guest 
 Static internal cluster IPs permitted for Corosync synchronization:
 - `198.82.18.154` (`cornet-node01`)
 - `198.82.18.155` (`cornet-node02`)
-- `128.173.88.72` (`cornet-node03`)
+- `128.173.88.74` (`cornet-node03`)
 - `128.173.88.73` (`cornet-node04`)
 
 ---

@@ -505,19 +505,20 @@ Keep the template. Tell campus IT which addresses were used so they can be reser
 
 ---
 
-## 11. Related incident: duplicate IP caused corosync flapping (2026-10-12)
+## 11. Related incident: duplicate IP caused corosync flapping (2026-10-12, Resolved 2026-11-05)
 
 Documented here because it affects whether it is safe to build VMs.
 
 - Symptom: `qm`/`pvesh` hung; corosync membership flapped every 15-25 s, splitting nodes by subnet (two votes each, no quorum).
   `corosync-cfgtool` still showed every link `connected`, so this was not a clean link-down.
-- Root cause: a campus device was answering ARP for the static IP of `node03`, so traffic went to whichever device answered last.
+- Root cause: a campus device was answering ARP for the static IP of `node03` (`128.173.88.72`), so traffic went to whichever device answered last.
   The other device was not ours (all NICs, BMCs and guest configs were ruled out).
 - Mitigation: `corosync` was stopped on node03 only (it holds no guests); the cluster ran quorate on the remaining three.
   `pmxcfs` on node04 had wedged and was fixed by restarting `pve-cluster` there.
-- Open: needs campus IT to find the other device and reserve/exclude the address. Do not bring node03 back until
-  `arping -c 40 -I vmbr0 <node03-ip>` shows a single MAC, then watch membership for 15 minutes.
-- Permanent fix for corosync stability remains the private `vmbr1` network over a WireGuard overlay.
+- Resolution (2026-11-05): Per campus IT guidance, `cornet-node03` was permanently migrated to clean static IP `128.173.88.74/24` (MAC `90:5a:08:30:d6:d8`).
+  - Updated `/etc/network/interfaces`, `/etc/hosts` across all 4 nodes, `/etc/pve/corosync.conf` (version 5), and `/etc/pve/firewall/cluster.fw`.
+  - Corosync re-enabled and restarted across cluster. 4-node quorum fully restored (`pvecm status`: 4/4 nodes, 4 votes, expected 4, quorum 3) with zero membership flapping.
+- Permanent architectural fix for corosync stability remains the private `vmbr1` network over a WireGuard overlay.
 
 Useful read-only diagnostics: `corosync-quorumtool -s`, `corosync-cfgtool -s`, `pvecm status`, the `journalctl -u corosync` grep in section 2.
 
