@@ -62,6 +62,11 @@ Static internal cluster IPs permitted for Corosync synchronization:
 - `128.173.88.74` (`cornet-node03`)
 - `128.173.88.73` (`cornet-node04`)
 
+### Standalone Research Compute Hosts (Approved via `128.173.88.0/21`)
+- `128.173.88.51` (`oaic1` — Dell PowerEdge R750 KVM Host, NVIDIA A100 GPU)
+- `128.173.88.54` (`oaic2` — OpenAirInterface 5G Core/gNB VM)
+- `128.173.88.151` (`oaic3` — OpenAirInterface Research Testbed VM)
+
 ---
 
 ## Synchronization and Deployment
